@@ -1,7 +1,71 @@
-<form method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/">
-    <input type="hidden" name="506816826453918" value="YOUR_APP_ID">
-    <input type="hidden" name="https://sujaychandraofficial.github.io/phoneauth.io/." value="YOUR_REDIRECT_URL">
-    <input type="hidden" name="000000" value="YOUR_CSRF_TOKEN">
-    <input type="hidden" name="fbAppEventsEnabled" value=true>
-    <button type="submit">Login</button>
-  </form>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Facebook Login JavaScript Example</title>
+<meta charset="UTF-8">
+<!-- HTTPS required. HTTP will give a 403 forbidden response -->
+<script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
+<script>
+
+  // initialize Account Kit with CSRF protection
+  AccountKit_OnInteractive = function(){
+    AccountKit.init(
+      {
+        // appId:282503112472035, 
+        appId:506816826453918,
+        state:"{{csrf}}", 
+        version:"v3.2",
+        fbAppEventsEnabled:true,
+        redirect:"www.google.com",
+        debug:true,
+      }
+    );
+  };
+
+  // login callback
+  function loginCallback(response) {
+    if (response.status === "PARTIALLY_AUTHENTICATED") {
+      var code = response.code;
+      var csrf = response.state;
+      // Send code to server to exchange for access token
+    }
+    else if (response.status === "NOT_AUTHENTICATED") {
+      // handle authentication failure
+    }
+    else if (response.status === "BAD_PARAMS") {
+      // handle bad parameters
+    }
+  }
+
+  // phone form submission handler
+  function smsLogin() {
+    var countryCode = document.getElementById("country_code").value;
+    var phoneNumber = document.getElementById("phone_number").value;
+    AccountKit.login(
+      'PHONE', 
+      {countryCode: countryCode, phoneNumber: phoneNumber}, // will use default values if not specified
+      loginCallback
+    );
+  }
+
+
+  // email form submission handler
+  function emailLogin() {
+    var emailAddress = document.getElementById("email").value;
+    AccountKit.login(
+      'EMAIL',
+      {emailAddress: emailAddress},
+      loginCallback
+    );
+  }
+</script>
+</head>
+<body>
+<input value="+1" id="country_code" />
+<input placeholder="phone number" id="phone_number"/>
+<button onclick="smsLogin();">Login via SMS</button>
+<div>OR</div>
+<input placeholder="email" id="email"/>
+<button onclick="emailLogin();">Login via Email</button>
+</body>
+</html>
